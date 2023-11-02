@@ -1,0 +1,167 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  /* max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center; */
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+/* Skeleton and animation */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: #0a2955;
+}
+
+.skeleton::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+      90deg,
+      rgba(25, 55, 99, 0) 0,
+      rgba(25, 55, 99, 0.2) 20%,
+      rgba(25, 55, 99, 0.5) 60%,
+      rgba(25, 55, 99, 0)
+  );
+  animation: shimmer 2s infinite;
+  content: "";
+}
+
+@keyframes shimmer {
+  100% {
+      transform: translateX(100%);
+  }
+}
+
+
+/* Home page gradient ending */
+.opacity-layer {
+  width: 100%;
+  height: 400px;
+  background: linear-gradient(
+      180deg,
+      rgba(4, 21, 45, 0) 0%,
+      #04152d 79.17%
+  );
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+@layer base{
+  .logo_text {
+    @apply  md:text-4xl text-3xl font-extrabold text-black tracking-wide;
+  }
+  .top {
+    @apply bg-opacity-25 bg-black/25 backdrop-blur-[3.5px] backdrop-filter;
+  }
+  .show {
+    @apply bg-[#020c1b]
+  }
+  .hide {
+    @apply translate-y-[60px];
+  }
+
+  @keyframes mobileMenu {
+    0% {
+        transform: translateY(-130%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+  }
+  /* Content Wrapper */
+  .contentWrapper {
+    @apply w-full max-w-[1200px] mx-auto py-5
+  }
+  /* Switching Tabs css */
+  .tabItem {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    color: var(--black);
+    font-size: 14px;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+    transition: color ease 0.3s;
+  }
+  .active {
+        color: white;
+  }
+
+  .movingBg {
+    height: 30px;
+    width: 100px;
+    border-radius: 15px;
+    background-image: linear-gradient(98.37deg, #f89e00 0.99%, #da2f68 100%);
+    position: absolute;
+    left: 0;
+    transition: left cubic-bezier(0.88, -0.35, 0.565, 1.35) 0.4s;
+}
+
+  /* Util Function */
+  .flex-center {
+    @apply flex justify-center items-center;
+  }
+
+  .app {
+    @apply relative flex justify-center items-center flex-col max-w-7xl mx-auto sm:px-16 px-6;
+  }
+
+  .flex-between {
+    @apply flex justify-between items-center;
+  }
+
+  /* Mobile Nav bar dropdown */
+  .dropdown {
+    @apply absolute right-0 top-full mt-3 w-full p-5 rounded-lg bg-white min-w-[210px] flex flex-col gap-2 justify-end items-end;
+  }
+  
+  .dropdown_link {
+    @apply text-sm font-montserrat text-gray-700 hover:text-gray-500 font-medium;
+  }
+
+  /* Loading Skeleton */
+  .skeletonItem {
+    @apply w-[125px] cursor-pointer flex-shrink-0 md:w-[200px] shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out
+  }
+  
+  /*Search query movie card*/
+  .posterBlock {
+    @apply relative w-full aspect-1/1.5 bg-cover bg-center mb-1 flex items-end justify-between p-[10px] transition-all ease-in-out duration-500
+  }
+}
+
