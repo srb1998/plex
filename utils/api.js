@@ -15,7 +15,15 @@ export const fetchDataFromApi = async(url, params) => {
         })
         return data
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         return error;
     }
 }
+
+// export const fetchSeasonData = async() => {
+//     try{
+//         const {data} = await axios.get(BASE_URL + url)
+//     } catch (error) {
+//         return error
+//     }
+// }

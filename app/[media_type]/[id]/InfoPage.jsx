@@ -7,7 +7,6 @@ import Recommend from "@/pages/details/Recommend";
 import VideosSection from "@/pages/details/VideosSection";
 import Similar from "@/pages/details/Similar";
 
-
 export default function InfoPage({ media_type,id }) {
   
   const { data,loading } = useFetch(`/${media_type}/${id}`)
@@ -16,22 +15,21 @@ export default function InfoPage({ media_type,id }) {
   const { data:similar , loading: similarLoading } = useFetch(`/${media_type}/${id}/similar`)
   const { data:recommendations , loading: recommendationsLoading } = useFetch(`/${media_type}/${id}/recommendations`)
 
-  // console.log(recommendations)
+  // console.log(data?.seasons?.[0])
   return (
     <main className="relative flex flex-col">
 
-      <Banner data={data} loading={loading} video={video?.results?.[0]} />
-
+      <Banner data={data} loading={loading} video={video?.results?.[0]} media_type={media_type} id={id} />
       <section className="my-6 md:contentWrapper">
         <Cast data={credits?.cast} loading={creditsLoading} />
       </section>
       <section className="mt-2  md:contentWrapper">
         <VideosSection data={video} loading={videoLoading} />
       </section>
-      <section className="my-6 md:contentWrapper">
+      <section className="mb-1 mt-2 md:contentWrapper">
         <Similar data={similar} loading={similarLoading} mediaType={media_type} id={id} />
       </section>
-      <section className="md:contentWrapper">
+      <section className="mb-6 md:contentWrapper">
         <Recommend data={recommendations} loading={recommendationsLoading} mediaType={media_type} id={id} />
       </section>
       <Footer />

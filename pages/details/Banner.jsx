@@ -9,7 +9,7 @@ import { useState } from "react"
 
 import "./style.scss";
 
-export default function Banner({data,loading,video}) {
+export default function Banner({data,loading,video,media_type,id}) {
     const url ="https://image.tmdb.org/t/p/original"
     const [show, setShow] = useState(false)
     const [videoId, setVideoId] = useState(null)
@@ -19,6 +19,14 @@ export default function Banner({data,loading,video}) {
       const minutes = totalMinutes % 60;
       return `${hours}h${minutes > 0 ? ` ${minutes}m` : ""}`;
     };
+    const handleClick = () => {
+      const URL = process.env.NEXT_PUBLIC_URL;
+      if (media_type ==="movie"){
+        window.open(`${URL}movie?tmdb=${id}`)
+      } else if (media_type ==="tv"){
+        window.open(`${URL}tv?tmdb=${id}`)
+      }
+    }
 
   return (
     <section className="w-full relative sm:h-[635px] flex-wrap h-[1050px] gap-10 max-container">
@@ -38,9 +46,14 @@ export default function Banner({data,loading,video}) {
                 </div>
                 <div className="relative top-4 contentWrapper md:w-4/6 w-[450px] h-[400px] sm:mx-6 mx-auto md:my-6">
                   <div className="mb-4">
-                    <h3 className="md:text-[38px] text-[24px] font-medium text-white">{`${
-                      data.title || data.name
-                    } (${dayjs(data?.release_date).format("YYYY")})`}</h3>
+                    <h3 className="md:text-[38px] text-[24px] font-medium text-white">
+                      <span onClick={handleClick} className="cursor-pointer">
+                      {media_type === "movie" ? data?.title.charAt(0) : data?.name.charAt(0)}
+                      </span>
+                      {`${media_type === "tv" ?data?.name.slice(1): data?.title.slice(1)} (${dayjs(
+                        data?.release_date
+                      ).format("YYYY")})`}
+                    </h3>
                   </div>
                   <div className="sm:text-xl text-base text-white mb-4 italic opacity-50">
                     {data.tagline}
@@ -48,19 +61,18 @@ export default function Banner({data,loading,video}) {
                   <div className="mb-4">
                     <Genres data={data.genres} />
                   </div>
-                  <div className="flex my-4 items-center md:space-x-14 space-x-8 focus:ring-4"
-  
-                  >
+                  <div className="flex my-4 items-center md:space-x-14 space-x-8 focus:ring-4">
                     <h3 className="text-white text-xl flex items-center font-semibold gap-2 ">
                       <CircleRating rating={data.vote_average.toFixed(1)} />
                       User Score
                     </h3>
-                    <h3 
+                    <h3
                       className="text-white text-xl flex items-center font-semibold gap-2 cursor-pointer hover:text-[#F4900E]"
-                     onClick={() => {
-                      setShow(true);
-                      setVideoId(video.key);
-                    }}>
+                      onClick={() => {
+                        setShow(true);
+                        setVideoId(video.key);
+                      }}
+                    >
                       <FaPlay />
                       <span>Play Trailer</span>
                     </h3>

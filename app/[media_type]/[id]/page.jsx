@@ -1,9 +1,9 @@
 import InfoPage from "./InfoPage";
-import { mediaDetail } from "@/utils/mediaDetail";
+import { fetchDataFromApi } from "@/utils/api";
 
 export async function generateMetadata({params:{media_type,id }}) {
-  const data = await mediaDetail(`/${media_type}/${id}`);
-  
+  const data = await fetchDataFromApi(`/${media_type}/${id}`);
+  // console.log(data)
   return {
     title:data?.title || data?.name || `Plex - ${media_type}`,
     description : "Explore latest Movies and Tv Shows"

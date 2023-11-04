@@ -20,7 +20,7 @@ const VideosSection = ({ data, loading }) => {
   };
 
   return (
-    <div className="relative overflow-hidden md:h-[300px] h-[250px]">
+    <div className="relative overflow-hidden md:h-[300px] h-[200px]">
       <div className="ml-4 md:text-[32px] text-[24px] text-white mb-2 font-semibold">Official Videos</div>
 
       {!loading ? (
@@ -41,7 +41,7 @@ const VideosSection = ({ data, loading }) => {
                 />
                 <div className="absolute inset-0 flex-center text-white md:text-3xl text-xl hover:text-[#F4900E]"><FaPlay /></div> 
               </div>
-              <div className="text-white md:text-[18px] text-[14px] font-medium font-inter">{video.name}</div>
+              <div className="text-white md:text-[18px] text-[14px] font-medium font-inter line-clamp-2">{video.name}</div>
             </div>
           ))}
           <VideoPopup
