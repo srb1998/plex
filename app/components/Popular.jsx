@@ -13,7 +13,7 @@ const Popular = () => {
   }
 
   return (
-    <section className='relative my-2 md:h-[510px] h-[400px] '>
+    <section className='relative mt-2 mb-8 md:h-[510px] h-[400px] '>
       <div className="w-full max-w-6xl mx-auto sm:px-0 px-4 flex items-center justify-between mb-5">
         <span className="text-white text-[25px] font-arial">What's Popular</span>
         <SwitchTabs data={["Movies", "TV Shows"]} onTabChange={onTabChange} />

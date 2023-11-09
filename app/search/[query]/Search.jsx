@@ -51,7 +51,7 @@ const Search = ({ query }) => {
               <div className="md:text-3xl text-2xl text-white mb-6">
                 {`Search ${
                   data.total_results > 1 ? "results" : "result"
-                } of '${query}'`}
+                } of '${query.replaceAll("%20", " ")}'`}
               </div>
               <InfiniteScroll
                 className="flex flex-wrap md:gap-5 gap-[10px] mb-[50px]"
