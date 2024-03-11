@@ -6,7 +6,7 @@ Plex is a platform that offers valuable insights to help users discover trending
 
 
 - [Live Link -](#features)
-https://plex-seven.vercel.app/
+https://plexwatch.vercel.app/
 
 ## Features
 
