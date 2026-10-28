@@ -1,5 +1,4 @@
 import {
-  FaFacebookF,
   FaInstagram,
   FaTwitter,
   FaLinkedin,
@@ -27,9 +26,6 @@ const Footer = () => {
         </div>
 
         <div className="flex-center gap-[10px] cursor-pointer hover:icon">
-          <span className="w-[50px] h-[50px] rounded-full bg-[#04152d] flex-center hover:shadow-pink-500 hover:text-pink-600">
-            <Link href="https://www.facebook.com/soug9999/" target="_blank"><FaFacebookF href="" /></Link>
-          </span>
           <span className="w-[50px] h-[50px] rounded-full bg-[#04152d] flex-center hover:shadow-pink-500 hover:text-pink-600">
             <Link href="https://www.instagram.com/the.sourabh.007/"
              target="_blank">

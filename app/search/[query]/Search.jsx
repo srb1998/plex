@@ -11,34 +11,41 @@ const Search = ({ query }) => {
   const [pageNum, setPageNum] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const fetchInitialData = () => {
-    setLoading(true)
-    fetchDataFromApi(`/search/multi?query=${query}&page=${pageNum}`).then((res) => {
-      setData(res)
-      setPageNum((prev)=> prev + 1)
-      setLoading(false)
-      return data
-    })
-  }
-
-  const fetchNextPageData = () => {
-    fetchDataFromApi(`/search/multi?query=${query}&page=${pageNum}`).then((res) => {
-      if(data?.results) {
-        setData({
-          ...data,results: [...data?.results, ...res.results]
-        })
-      } else {
-        setData(res)
+  // `page` is passed explicitly: the old code called setPageNum(1) and then read
+  // the stale `pageNum` from the closure, so searching again fetched whatever
+  // page you had scrolled to on the previous query.
+  const fetchPage = (page, append) => {
+    fetchDataFromApi(`/search/multi`, { query, page }).then((res) => {
+      if (!res?.results) {
+        if (!append) setData(res);
+        setLoading(false);
+        return;
       }
-      setPageNum((prev)=> prev + 1)
-      return data;
-    })
-  }
+
+      if (append) {
+        setData((prev) => ({
+          ...prev,
+          ...res,
+          results: [...(prev?.results ?? []), ...res.results],
+        }));
+      } else {
+        setData(res);
+      }
+
+      setPageNum(page + 1);
+      setLoading(false);
+    });
+  };
+
+  const fetchNextPageData = () => fetchPage(pageNum, true);
 
   useEffect(() => {
+    setLoading(true);
+    setData(null);
     setPageNum(1);
-    fetchInitialData();
-  },[query])
+    fetchPage(1, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[query]);
   
   return (
     <div className="pt-[100px] flex-center">
@@ -46,7 +53,7 @@ const Search = ({ query }) => {
       {loading && <Spinner />}
       {!loading && data && (
         <div className="contentWrapper">
-          {data.results.length > 0 ? (
+          {data.results?.length > 0 ? (
             <>
               <div className="md:text-3xl text-2xl text-white mb-6">
                 {`Search ${
@@ -55,9 +62,9 @@ const Search = ({ query }) => {
               </div>
               <InfiniteScroll
                 className="flex flex-wrap md:gap-5 gap-[10px] mb-[50px]"
-                dataLength={data.results.length || []}
+                dataLength={data.results?.length || 0}
                 next={fetchNextPageData}
-                hasMore={pageNum <= data.total_pages}
+                hasMore={pageNum <= (data.total_pages ?? 0)}
                 loader={<Spinner />}
               >
                 {data.results.map((item, index) => {
@@ -79,5 +86,4 @@ const Search = ({ query }) => {
   );
 }
 
-export default Search
-
+export default Search;

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState,useEffect } from "react"
+import { useState,useEffect,useRef } from "react"
 
 import useFetch from "@/hooks/useFetch"
 import { fetchDataFromApi } from "@/utils/api"
@@ -9,18 +9,25 @@ import Spinner from "@/pages/spinner/Spinner"
 import Select from "react-select";
 import InfiniteScroll from "react-infinite-scroll-component"
 
-let filters = {};
+// `primary_release_date` and `original_title` are MOVIE-only sort keys.
+// /discover/tv rejects them with HTTP 400, which is why the TV tab broke as soon
+// as you picked "Release Date" or "Title (A-Z)". TV needs first_air_date /
+// original_name instead.
+const sortOptionsFor = (mediaType) => {
+    const isTv = mediaType === "tv";
+    const dateKey = isTv ? "first_air_date" : "primary_release_date";
+    const titleKey = isTv ? "original_name" : "original_title";
 
-const sortbyData = [
-    { value: "popularity.desc", label:"Popularity Descending"},
-    { value: "popularity.asc", label:"Popularity Ascending"},
-    { value: "vote_average.desc", label:"Rating Descending"},
-    { value: "vote_average.asc", label:"Rating Ascending"},
-    { value: "primary_release_date.desc", label:"Release Date Descending"},
-    { value: "primary_release_date.asc", label:"Release Date Ascending"},
-    { value: "original_title.asc", label:"Title (A-Z)"},
-
-]
+    return [
+        { value: "popularity.desc", label:"Popularity Descending"},
+        { value: "popularity.asc", label:"Popularity Ascending"},
+        { value: "vote_average.desc", label:"Rating Descending"},
+        { value: "vote_average.asc", label:"Rating Ascending"},
+        { value: `${dateKey}.desc`, label:"Release Date Descending"},
+        { value: `${dateKey}.asc`, label:"Release Date Ascending"},
+        { value: `${titleKey}.asc`, label:"Title (A-Z)"},
+    ];
+};
 
 const Explore = ({mediaType}) => {
     const [data,setData] = useState(null);
@@ -28,64 +35,67 @@ const Explore = ({mediaType}) => {
     const [loading, setLoading] = useState(false);
     const [genre, setGenre] = useState(null);
     const [sortby, setSortby] = useState(null);
-    
+
+    // Was a module-level `let filters = {}`, shared by the movie and TV pages.
+    const filters = useRef({});
+
     const { data:genresData } = useFetch(`/genre/${mediaType}/list`)
 
-    const fetchInitialData = () => {
+    // Page is passed explicitly. Reading `pageNum` from a stale closure after
+    // setPageNum(1) made "reset to page 1" fetch an old page instead.
+    const loadPage = (page) => {
         setLoading(true);
-        fetchDataFromApi(`/discover/${mediaType}`, filters).then((res)=>{
-            setData(res)
-            setPageNum((prev) => prev + 1)
-            setLoading(false);
-        });
+        fetchDataFromApi(`/discover/${mediaType}`, { ...filters.current, page })
+            .then((res) => {
+                setData(res);
+                setPageNum(page + 1);
+                setLoading(false);
+            });
     };
 
     const fetchNextPageData = () => {
-        fetchDataFromApi(`/discover/${mediaType}?page=${pageNum}`,filters)
+        fetchDataFromApi(`/discover/${mediaType}`, { ...filters.current, page: pageNum })
             .then((res) => {
-                if(data?.results) {
-                setData({
-                    ...data,results:[...data?.results, ...res.results],
-                });
-            } else {
-                setData(res)
-            }
-            setPageNum((prev) => prev + 1);
-        });
+                if (!res?.results) return;
+                setData((prev) => ({
+                    ...prev,
+                    ...res,
+                    results: [...(prev?.results ?? []), ...res.results],
+                }));
+                setPageNum(pageNum + 1);
+            });
     };
 
     useEffect(() => {
-        filters = {}
+        filters.current = {}
         setData(null);
         setPageNum(1);
         setSortby(null);
         setGenre(null);
-        fetchInitialData();
+        loadPage(1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[mediaType]);
 
     const onChange = (selectedItems,action) => {
         if (action.name === "sortby"){
             setSortby(selectedItems);
             if (action.action !== "clear") {
-                filters.sort_by = selectedItems.value;
+                filters.current.sort_by = selectedItems.value;
             } else {
-                delete filters.sort_by;
+                delete filters.current.sort_by;
             }
         }
 
         if (action.name === "genres") {
             setGenre(selectedItems);
             if (action.action !== "clear") {
-                let genreId = selectedItems.map((g) => g.id);
-                genreId = JSON.stringify(genreId).slice(1, -1);
-                filters.with_genres = genreId;
+                filters.current.with_genres = selectedItems.map((g) => g.id).join(",");
             } else {
-                delete filters.with_genres;
+                delete filters.current.with_genres;
             }
         }
 
-        setPageNum(1);
-        fetchInitialData();        
+        loadPage(1);
     };
 
   return (
@@ -111,7 +121,7 @@ const Explore = ({mediaType}) => {
                 <Select
                     name="sortby"
                     value={sortby}
-                    options={sortbyData}
+                    options={sortOptionsFor(mediaType)}
                     onChange={onChange}
                     isClearable={true}
                     placeholder="Sort by"
@@ -126,9 +136,9 @@ const Explore = ({mediaType}) => {
                 {data?.results?.length > 0 ? (
                     <InfiniteScroll
                         className="flex flex-wrap flex-row contentWrapper md:gap-[20px] gap-[10px] mb-5"
-                        dataLength={data?.results?.length || []}
+                        dataLength={data?.results?.length || 0}
                         next={fetchNextPageData}    
-                        hasMore={pageNum <= data?.total_pages}
+                        hasMore={pageNum <= (data?.total_pages ?? 0)}
                         loader={<Spinner />}     
                     >
                         {data?.results?.map((item,index) => {

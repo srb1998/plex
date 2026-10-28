@@ -12,7 +12,7 @@ export default function Ratings({data}) {
       </svg>
       {data && (
         <>
-        <p className="ml-[1px] md:text-sm text-[13px] font-medium text-white">({data?.vote_average.toFixed(1)})</p>
+        <p className="ml-[1px] md:text-sm text-[13px] font-medium text-white">({Number(data?.vote_average ?? 0).toFixed(1)})</p>
         {/* <span className="w-1 h-1 mx-1.5 bg-gray-500 rounded-full dark:bg-gray-400"></span>
         <a href="#" className="text-sm font-medium text-gray-900 underline hover:no-underline dark:text-white">{data?.vote_count}</a> */}
         </>

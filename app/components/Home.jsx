@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation"
 import { useEffect,useState } from "react"
 import Image from "next/image"
 import useFetch from "../../hooks/useFetch"
+import { imgUrl } from "@/utils/api"
 
 const Homepage = () => {
 
@@ -10,12 +11,17 @@ const Homepage = () => {
   const [ query, setQuery ] = useState("");
   const {data, loading} = useFetch("/movie/upcoming");
   const router = useRouter();
-  const url = "https://image.tmdb.org/t/p/original/"
 
   useEffect(() => {
-    const bg = url+data?.results?.[Math.floor(Math.random() * 20)]?.backdrop_path
-    // const bg = "https://image.tmdb.org/t/p/original/oghHR3X0hIcvs7xqyoFjA0GAZWn.jpg"
-    setBackground(bg);
+    const results = data?.results ?? [];
+    if (results.length === 0) {
+      setBackground("");
+      return;
+    }
+    // Was `Math.random() * 20`, which returned undefined whenever fewer than
+    // 20 upcoming titles came back, handing Next/Image an invalid src.
+    const pick = results[Math.floor(Math.random() * results.length)];
+    setBackground(imgUrl(pick?.backdrop_path, "w1280") ?? "");
   },[data]);
 
   const searchQueryHandler = (e) => {
@@ -27,6 +33,7 @@ const Homepage = () => {
 
   const handleFormSubmission = (e) => {
     e.preventDefault();
+    if (query.trim().length === 0) return;
     router.push(`/search/${query}`);
   }
 
@@ -57,13 +64,15 @@ const Homepage = () => {
             </div>
         </div>
         <div className="w-full flex top-0 left-0 inset-0 opacity-60 ">
-            <Image
-            src={background}
-            alt="Backdrop Image"
-            loading="lazy"
-            fill={true}
-            className="object-cover"
-            />
+            {background && (
+              <Image
+              src={background}
+              alt="Backdrop Image"
+              loading="lazy"
+              fill={true}
+              className="object-cover"
+              />
+            )}
         </div>
         <div className="opacity-layer"></div>
 

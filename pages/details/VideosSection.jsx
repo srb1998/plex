@@ -37,7 +37,8 @@ const VideosSection = ({ data, loading }) => {
               <div className="mb-4 relative rounded-2xl overflow-hidden shadow-xl transition-shadow ">
                 <img
                   src={`https://img.youtube.com/vi/${video.key}/mqdefault.jpg`}
-                  fill
+                  alt={video.name || "video thumbnail"}
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 flex-center text-white md:text-3xl text-xl hover:text-[#F4900E]"><FaPlay /></div> 
               </div>
